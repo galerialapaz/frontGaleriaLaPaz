@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Informacion</title>
+<link rel="stylesheet" href="../css/head.css">
+<link rel="stylesheet" href="../css/menu.css">
+<link rel="stylesheet" href="../css/formulario.css">
+<link rel="stylesheet" href="../css/loadAnimacion.css">
+<link rel="stylesheet" href="../css/icon.css">
+<link rel="stylesheet" href="../css/tabla.css">
+<script src="../js/indexedDB.js"></script>
+<script src="../js/fecha.js"></script>
+<script src="../js/formulario.js"></script>
+<script src="../js/loadAnimacion.js"></script>
+<script src="../js/localStorage.js"></script>
+<script src="../js/apiBakend.js"></script>
+<script src="../js/lnk.js"></script>
+<script src="../js/tabla.js"></script>
+<style>
+.a{margin-left: 10px;margin-right: 10px;}
+.nom{width: 115px;}
+</style>
+</head>
+<body onload="startDB();">
+<div class="conteMenu">
+  <span class="back" onclick="window.history.back()"></span>
+  <div class="titMenu">INFORMACION</div>
+</div>   
+
+<div class="formularioV1">
+  <div class="textDataInf">
+    <div>Producto :</div>
+    <div data-nch id="producto"></div>
+  </div>
+  <div class="textDataInf">
+    <div>Marca :</div>
+    <div data-nch id="marca"></div>
+  </div>
+  <div class="textDataInf">
+    <div>Modelo:</div>
+    <div data-nch id="modelo"></div>
+  </div>
+  <hr>
+  <div class="textDataInf">
+    <div class="nom">Precio UNO :</div>
+    <div data-nch id="punMn"></div>
+    <span class="a"> a </span>
+    <div data-nch id="punMx"></div>
+    <span class="a">Bs.</span>
+  </div>
+  <div class="textDataInf">
+    <div class="nom">Precio 12 :</div>
+    <div data-nch id="pdoMn"></div>
+    <span class="a"> a </span>
+    <div data-nch id="pdoMx"></div>
+    <span class="a">Bs.</span>
+  </div>
+  <div class="textDataInf">
+    <div class="nom">Precio 30 :</div>
+    <div data-nch id="ptrMn"></div>
+    <span class="a"> a </span>
+    <div data-nch id="ptrMx"></div>
+    <span class="a">Bs.</span>
+  </div>
+  <div class="textDataInf">
+    <div class="nom">Precio 50 :</div>
+    <div data-nch id="pciMn"></div>
+    <span class="a"> a </span>
+    <div data-nch id="pciMx"></div>
+    <span class="a">Bs.</span>
+  </div>
+  <div class="textDataInf">
+    <div class="nom">Precio 100 :</div>
+    <div data-nch id="pceMn"></div>
+    <span class="a"> a </span>
+    <div data-nch id="pceMx"></div>
+    <span class="a">Bs.</span>
+  </div>
+  <div class="textDataInf">
+    <div class="nom">Precio Caja :</div>
+    <div data-nch id="pcjMn"></div>
+    <span class="a"> a </span>
+    <div data-nch id="pcjMx"></div>
+    <span class="a">Bs.</span>
+  </div>
+  <hr>
+  <div class="textDataInf">
+    <div>Puesto Uno :</div>
+    <div data-nch id="puesto_uno"></div>
+    <span class="a"> Unidades </span>
+  </div>
+  <div class="textDataInf">
+    <div>Puesto Dos :</div>
+    <div data-nch id="puesto_dos"></div>
+    <span class="a"> Unidades </span>
+  </div>
+  <div class="textDataInf">
+    <div>Deposito Uno :</div>
+    <div data-nch id="deposito_uno"></div>
+    <span class="a"> Unidades </span>
+  </div>
+  <div class="textDataInf">
+    <div>Deposito Dos :</div>
+    <div data-nch id="deposito_dos"></div>
+    <span class="a"> Unidades </span>
+  </div>
+  
+</div>
+
+<script>
+var id = storage('id')
+
+async function init_m(){
+  let dat = await read_ID_DB(id,"articulos")
+  await json_to_from("nch",dat)
+}   
+</script> 
+</body>
+</html>

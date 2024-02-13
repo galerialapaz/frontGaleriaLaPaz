@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Traslados</title>
+<link rel="stylesheet" href="../css/head.css">
+<link rel="stylesheet" href="../css/icon.css">
+<link rel="stylesheet" href="../css/menu.css">
+<link rel="stylesheet" href="../css/formulario.css">
+<link rel="stylesheet" href="../css/loadAnimacion.css">
+<link rel="stylesheet" href="../css/botones.css">
+<link rel="stylesheet" href="../css/tabla.css">
+<link rel="stylesheet" href="../cssLib/toastify.css">
+<script src="../js/apiBakend.js"></script>
+<script src="../js/indexedDB.js"></script>
+<script src="../js/fecha.js"></script>
+<script src="../js/formulario.js"></script>
+<script src="../js/localStorage.js"></script>
+<script src="../js/loadAnimacion.js"></script>
+<script src="../js/lnk.js"></script>
+<script src="../js/tabla.js"></script>
+<script src='../jsLib/toastify.js'></script>
+<style>
+.contenTable{
+  width: 98%;
+  height: calc(100vh - 50px);
+  margin: auto;
+  margin-top: 10px;
+  overflow-y: scroll;
+  z-index: 1;
+}
+</style>
+</head>
+<body onload="startDB();">
+<div class="conteMenu">
+  <div class="cajaIzq">
+    <span class="icon back" onclick="window.history.back()"></span>
+    <span id="conection" onclick="sincroBD('movimientos','m')" class="icon cloudDowRed"></span>
+  </div>
+  <div id="fechaVentas_Txt"></div>
+  <div>
+    <span class="icon filter" onclick="lnkRel('filtroSet/filtroMovGral')"></span>
+    <span onclick="listVer()" class="icon menuBurger"></span>  
+  </div>
+</div>  
+<div id="contedOcultador" class="contedOcultador"></div>
+<div class="contenTable">
+  <table onclick="oculVer()">
+    <thead>
+      <tr id="headColm">
+        <th>N°</th>
+        <th>Usuario</th>
+        <th>fecha </th>
+        <th>fecha y hora</th>
+        <th>Origen </th>
+        <th>Destino </th>
+        <th>ver</th>
+      </tr>
+    </thead>
+    <tbody id="listaDitem"></tbody>
+  </table>
+</div>
+
+<script>
+let du = storageJson("dataUser")
+let dep = storage("deposito")  
+
+var items = []  
+var listVen = []
+async function renderTab(){
+  //listVen = []
+  let listVen = await read_DB('movimientos')
+
+  var outerHTML = '';
+  let n = 1
+  for (let i = 0; i < listVen.length; i++) {
+    let el = listVen[i];
+    if(el.user!=du.user){continue}
+    if(el.origen==dep){
+      let or = el.origen.split("_")[0].toUpperCase()+" "+el.origen.split("_")[1].toUpperCase()
+      let ds = el.destino.split("_")[0].toUpperCase()+" "+el.destino.split("_")[1].toUpperCase()
+      outerHTML += 
+      `<tr id="${el.id}">
+        <td>${n}</td>
+        <td>${el.dataUser["nom"]}</td>
+        <td>${diaMesCorto(el.fecha)}</td>
+        <td>${fechTxtFull(el.fecha)}</td>
+        <td>${or}</td>
+        <td>${ds}</td>
+        <td>
+          <span onclick="lnkRutId('${el.id}','trasladoInfo')" class="icon eyes">
+        </td>
+      </tr>`
+      n+=1
+    }  
+  }
+  document.querySelector("#listaDitem").innerHTML = outerHTML;
+  manejoColumnas("tabla")
+}
+
+async function init_m(){ 
+  let fil = await storageJsonSetup("filvent",{"todoFecha":false,"fechaVentas":fecActInp()})
+  document.getElementById("fechaVentas_Txt").textContent = timeToMesDia(fil.fechaVentas) 
+  await renderTab()
+  openSocket("sincVEN");
+}   
+</script>
+</body>
+</html>

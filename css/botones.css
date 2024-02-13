@@ -1,0 +1,40 @@
+
+/*botones btn-material*/
+.btn-material{
+  width: fit-content;
+  margin: auto;
+  padding: 5px;
+  background-color: #ffffff;
+  box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2),
+    0 2px 2px 0 rgba(0, 0, 0, 0.14),
+    0 1px 5px 0 rgba(0, 0, 0, 0.12);
+  color: rgb(0, 0, 0);
+  line-height: 2.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  font-size: inherit;
+  line-height: inherit;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  text-align: center;
+}
+.btn-material:active {
+	box-shadow: 2px 2px 2px #777, 0px 0px 35px 0px #00b7f8;
+	border-bottom:1px solid #f7f7f7;
+  text-shadow:  0px 0px 5px #fff, 0px 0px 5px #fff;
+  color: rgb(0, 0, 0);
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  border: none;
+  outline:none;
+}
+.btn-material:focus {	outline:none; }
+
+.azul{background-color: rgb(47, 68, 252); color: white;}
+.danger{background-color: hwb(0 0% 0%);color: white;}
+.info{ background-color: rgb(5, 139, 0); color: white;}
+/*botones btn-material*/

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>VENDER</title>
+<link rel="stylesheet" href="../css/head.css">
+<link rel="stylesheet" href="../css/icon.css">
+<link rel="stylesheet" href="../css/menu.css">
+<link rel="stylesheet" href="../css/formulario.css">
+<link rel="stylesheet" href="../css/loadAnimacion.css">
+<link rel="stylesheet" href="../css/botones.css">
+<link rel="stylesheet" href="../css/tabla.css">
+<link rel="stylesheet" href="../css/proforma.css">
+<link rel="stylesheet" href="../cssLib/toastify.css">
+<script src="../js/apiBakend.js"></script>
+<script src="../js/indexedDB.js"></script>
+<script src="../js/fecha.js"></script>
+<script src="../js/formulario.js"></script>
+<script src="../js/localStorage.js"></script>
+<script src="../js/loadAnimacion.js"></script>
+<script src="../js/lnk.js"></script>
+<script src="../js/tabla.js"></script>
+<script src='../jsLib/toastify.js'></script>
+<style>
+#productosList{
+  overflow-y: scroll;
+  height: calc(100vh - 100px);
+}
+#fecha{color: white;font-weight: bold;}
+.hiden{ display: none;}
+</style>
+</head>
+<body onload="startDB();">
+<div class="conteMenu">
+  <span class="icon back" onclick="window.history.back()"></span>
+  <span onclick="editar()" id="bntVender" class="btn-material">EDITAR</span> 
+  <span id="fecha" class="fechaMenu"></span>
+</div>  
+
+<div class="formularioV1">
+  <div class="textDataInf">
+    <div>Destino :</div>
+    <div id="destino" ></div>
+  </div>
+</div>
+<br>
+<div id="productosList"></div>
+
+<script>
+var id = storage('id')  
+var car = storageJson("proforma")
+let origen 
+let destino
+
+async function rederVenta(){
+  let arr = Object.values(car).sort((x, y) => x.marca.localeCompare(y.marca));
+  var outerHTML = '';
+  for (let i = 0; i < arr.length; i++) {
+    const el = arr[i];
+    outerHTML += 
+    `<div class="itemProf">
+      <div class="fila1">
+        <div class="fila1a">${el.marca}</div>
+        <div class="fila1b">
+          <span>${el.modelo}</span>  
+          <span onclick="quitarCarro('${el.id}')" class="icon borrar"></span> 
+        </div>
+      </div>
+      <div class="filP2">
+        <div class="fila1b">
+          <div>Cantidad</div>
+          <input type="number" onkeyup="imprItem('${el.id}')" id="${el.id}_cant" value="${el.cant}" /> 
+        </div>
+      </div>
+    </div>`
+  }
+  document.querySelector("#productosList").innerHTML = outerHTML;
+}
+async function imprItem(id){
+  let cant = ValNum(id+"_cant")
+  car[id]["cant"] = cant
+  await setcar(car)
+}
+async function quitarCarro(id){ 
+  delete car[id]; 
+  await setcar(car)
+  window.location.reload()
+}
+
+async function editar(){
+  let d = await form_to_json("item",id)
+  let r = confirm("Editar ...?")
+  if(r){
+    loadData()
+    d["origen"] = origen
+    d["destino"] = destino
+    d["proforma"] = car
+    let c = await apiPostJsonRut("updateMovimiento",d) 
+    if(c.msg=="success"){
+      localStorage.setItem("proforma","")
+      document.getElementById("bntVender").style.display = "none"
+      await update_DB(id,d,'movimientos')
+      successDat()
+      sendMessage()
+    }else{ alert("error") }
+  }
+}
+
+function setcar(car){
+  return new Promise(function(resolve,reject){ 
+    localStorage.setItem("proforma",JSON.stringify(car))
+    resolve()
+  })
+}
+
+async function init_m(){ 
+  let dat = await read_ID_DB(id,"movimientos")
+  origen = dat.origen
+  destino = dat.destino
+  document.getElementById("destino").textContent = dat.destino.split("_")[0].toUpperCase()+" "+dat.destino.split("_")[1].toUpperCase()
+  rederVenta()
+  openSocket(); 
+}
+</script>
+</body>
+</html>

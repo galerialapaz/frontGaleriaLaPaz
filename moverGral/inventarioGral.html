@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>INVENTARIO</title>
+<link rel="stylesheet" href="../css/head.css">
+<link rel="stylesheet" href="../css/icon.css">
+<link rel="stylesheet" href="../css/menu.css">
+<link rel="stylesheet" href="../css/formulario.css">
+<link rel="stylesheet" href="../css/loadAnimacion.css">
+<link rel="stylesheet" href="../css/botones.css">
+<link rel="stylesheet" href="../css/tabla.css">
+<link rel="stylesheet" href="../cssLib/toastify.css">
+<script src="../js/apiBakend.js"></script>
+<script src="../js/indexedDB.js"></script>
+<script src="../js/fecha.js"></script>
+<script src="../js/formulario.js"></script>
+<script src="../js/localStorage.js"></script>
+<script src="../js/loadAnimacion.js"></script>
+<script src="../js/lnk.js"></script>
+<script src="../js/tabla.js"></script>
+<script src='../jsLib/toastify.js'></script>
+<style>
+
+</style>
+</head>
+<body onload="startDB();">
+<div class="conteMenu">
+  <div class="cajaIzq">
+    <span class="icon back" onclick="window.history.back()"></span>&nbsp;&nbsp;
+    <span id="conection" onclick="sincroBD('articulos','m')" class="icon cloudDowRed"></span>
+  </div>
+  <div class="titMenu" id="titulo"></div>
+  <span onclick="listVer()" class="icon menuBurger"></span>  
+</div>   
+
+<div class="buscador">
+  <input class="input_ef" size="10" type="text" id="buscar" onkeyup="filtroBus()" placeholder="Buscar Marca o Modelo">  
+</div>
+
+<div class="secionCheck">
+  <div id="contedOcultador" class="contedOcultador"></div>
+</div>
+
+<div class="contenTable">
+  <table  onclick="oculVer()">
+    <thead>
+      <tr id="headColm">
+        <th>N°</th>
+        <th>Producto</th>
+        <th>Marca</th>
+        <th>Modelo</th>
+        <th>D1</th>
+        <th>D2</th>
+        <th>TOT</th>
+      </tr>
+    </thead>
+    <tbody id="listaDitem"></tbody>
+  </table>
+</div>
+
+<script>
+var items = []
+async function renderTab(){
+  let dat = await read_DB("articulos")
+  var outerHTML = '';
+  for (let i = 0; i < dat.length; i++){
+    const el= dat[i];
+    outerHTML += 
+    `<tr id="${el.id}">
+      <td>${i+1}</td>
+      <td>${el.producto}</td>
+      <td>${el.marca}</td>
+      <td>${el.modelo}</td>
+      <td class="bs">${el.deposito_uno}</td>
+      <td class="bs">${el.deposito_dos}</td>
+      <td class="bs">${el.deposito_dos+el.deposito_uno}</td>
+    </tr>` 
+    items.push({"id":el.id,"txt":el.marca+" "+el.modelo+" "+el.producto})    
+  }
+  document.querySelector("#listaDitem").innerHTML = outerHTML;
+  manejoColumnas("inventario") 
+}
+
+async function init_m(){
+  renderTab()
+  openSocket("sincINV");
+}   
+</script>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es" >
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>FILTRO</title>
+<link rel="stylesheet" href="../css/head.css">
+<link rel="stylesheet" href="../css/index.css">
+<link rel="stylesheet" href="../css/menu.css">
+<link rel="stylesheet" href="../css/formulario.css">
+<link rel="stylesheet" href="../css/loadAnimacion.css">
+<link rel="stylesheet" href="../css/icon.css">
+<script src="../js/indexedDB.js"></script>
+<script src="../js/formulario.js"></script>
+<script src="../js/loadAnimacion.js"></script>
+<script src="../js/localStorage.js"></script>
+<script src="../js/apiBakend.js"></script>
+<script src="../js/lnk.js"></script>
+<script src="../js/fecha.js"></script>
+</head>
+<style>
+.info{width: 100px;}
+.selectTip1{ width: 70%;}
+</style>
+<body onload="startDB()">
+<div class="conteMenu">
+  <span class="icon back" onclick="window.history.back()"></span>
+</div> 
+
+<div class="formularioV1">
+  <div class="inputDate">
+    <span>Fecha.</span>
+    <div>
+      <div id="fecha_Txt"></div>
+      <input data-filVenAdm id="fecha" onchange="saveText(event)" class="pickCalendar" type='date'/>      
+    </div>
+  </div>
+  <div class="txtCheckbox">
+    <div>Dias: </div>
+    <label class="todoFecha" for="todo">
+      Todos <input data-filVenAdm type="checkbox" onchange="checkbox(event)" id="todo" >
+    </label>
+  </div>
+  <div class="txtAndSelector">
+    <div class="textSelec">Usuario :</div> 
+    <div class="selectTip1">
+      <select class="selector" data-filVenAdm onchange="saveText(event)" id="user"></select>
+      <div class="select-icon">
+        <svg focusable="false" viewBox="0 0 104 128" width="25" height="35">
+          <path d="m2e1 95a9 9 0 0 1 -9 9 9 9 0 0 1 -9 -9 9 9 0 0 1 9 -9 9 9 0 0 1 9 9zm0-3e1a9 9 0 0 1 -9 9 9 9 0 0 1 -9 -9 9 9 0 0 1 9 -9 9 9 0 0 1 9 9zm0-3e1a9 9 0 0 1 -9 9 9 9 0 0 1 -9 -9 9 9 0 0 1 9 -9 9 9 0 0 1 9 9zm14 55h68v1e1h-68zm0-3e1h68v1e1h-68zm0-3e1h68v1e1h-68z"></path>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="botones">
+    <button class="btn-material info" id="btnGuar" onclick="window.history.back()">Filtrar</button>
+  </div>
+</div>
+
+<script>
+async function cargaVendedores(){
+  return new Promise(function(resolve,reject){  
+    read_DB('usuarios').then((dat)=>{
+      let outerHTMLvendor = `<option value="todos">Todos</option>`;
+      for (let i = 0; i < dat.length; i++){
+        const el = dat[i];
+        if(el.rol=="Administrador"){continue}
+        if(el.rol=="deposito_uno"){continue}
+        if(el.rol=="deposito_dos"){continue}
+        if(el.rol=="deposito_general"){continue}
+        outerHTMLvendor += `<option value="${el.user}">${el.nom}</option> `
+      }
+      document.querySelector("#user").innerHTML = outerHTMLvendor;
+    })
+    resolve(true)
+  })
+}  
+async function init_m(){
+  await cargaVendedores()
+  setTimeout(async()=>{
+    let fil = await storageJsonSetup("filvenadm",{"todo":false,"fecha":fecActInp(),"user":"todos"})
+    await json_to_from("filvenadm",fil)
+  },100)
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es" >
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Lista Usuarios</title>
+<link rel="stylesheet" href="../css/head.css">
+<link rel="stylesheet" href="../css/menu.css">
+<link rel="stylesheet" href="../css/formulario.css">
+<link rel="stylesheet" href="../css/loadAnimacion.css">
+<link rel="stylesheet" href="../css/botones.css">
+<link rel="stylesheet" href="../css/icon.css">
+<link rel="stylesheet" href="../css/tabla.css">
+<script src="../js/apiBakend.js"></script>
+<script src="../js/indexedDB.js"></script>
+<script src="../js/fecha.js"></script>
+<script src="../js/formulario.js"></script>
+<script src="../js/localStorage.js"></script>
+<script src="../js/loadAnimacion.js"></script>
+<script src="../js/lnk.js"></script>
+<script src="../js/tabla.js"></script>
+<script src="../js/utilidades.js"></script>
+</head>
+<style>
+</style>
+<body onload="startDB()">
+<div class="conteMenu">
+  <span class="icon back" onclick="window.history.back()"></span>
+  &nbsp;&nbsp;&nbsp;
+  <span class="icon iconFileDow" onclick="datosUsuarios()"></span>
+  &nbsp;&nbsp;&nbsp;
+  <span onclick="lnk('upDataUser')" class="icon iconFileUp" ></span>
+  <div onclick="lnk('formReg')" class="btn-material">Nuevo Usuario</div> 
+  <span class="icon cloudDow" onclick="sincroBD('usuarios','m')"></span>
+</div>
+
+<div class="buscador">
+  <input class="input_ef" type="text" id="buscar" onkeyup="filtroBus()" placeholder="Buscar por Nombre">  
+</div>
+
+<div class="contenTable" >
+  <table>
+    <thead>
+      <tr>
+        <th>N°</th>
+        <th>Nombre</th>
+        <th>Rol</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody id="listaDitem"></tbody>
+  </table>
+</div>
+
+<script>
+var items =[]
+var dat
+async function renderTabla(){
+  dat = await read_DB("usuarios")
+  let outerHTML = '';
+  for (let i = 0; i < dat.length; i++) {
+    let el = dat[i];
+    outerHTML+=`
+    <tr id="${el.id}">
+      <td>${i+1}</td>
+      <td data-itm id="ref_${el.id}">${el.nom}</td>
+      <td >${el.rol}</td>
+      <td>
+        <span onclick="editarUser('${el.id}')" class="icon pencil">
+      </td>
+    </tr>`
+    items.push({"id":el.id,"txt":el.nom}) 
+  }
+  document.getElementById("listaDitem").innerHTML = outerHTML 
+}
+
+function editarUser(id){
+  localStorage.setItem('userIDedit', id);
+  lnk("formEdit")
+}
+async function datosUsuarios(){
+  await downloadTxt(dat, diaMesYear()+" Usuarios")
+}
+function init_m(){  
+  renderTabla() 
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="../css/head.css">
+<link rel="stylesheet" href="../css/menu.css">
+<link rel="stylesheet" href="../css/formulario.css">
+<link rel="stylesheet" href="../css/loadAnimacion.css">
+<link rel="stylesheet" href="../
+css/icon.css">
+<script src="../js/indexedDB.js"></script>
+<script src="../js/formulario.js"></script>
+<script src="../js/loadAnimacion.js"></script>
+<script src="../js/localStorage.js"></script>
+<script src="../js/apiBakend.js"></script>
+<script src="../js/lnk.js"></script>
+<title>Login</title>
+<style>
+.btn-material{ width: 250px; }
+#nombre{
+  text-align: center;
+  padding: 10px;
+  font-weight: bold;
+}
+input{text-align: center;}
+</style>
+</head>
+<body onload="startDB();">
+<div class="conteMenu">
+  <span class="icon back" onclick="window.history.back()"></span>
+  <div class="titMenu">LOGIN</div>
+  <span></span>
+</div>
+<div id="nombre"></div>
+<div class="formularioV1">
+  <div id="input">
+    <div class="contInput">
+      <input  id="user" onkeyup="teclaEnter(event)" class="input_ef" type="text" placeholder=""/>
+      <label class="label_ef">Usuario</label>
+    </div>
+    <div class="contInput">
+      <input  id="password" onkeyup="teclaEnter(event)" class="input_ef" type="password" placeholder=""/>
+      <label class="label_ef">Contraseña</label>
+      <span class="btnEyePass icon eyesBlack" onclick="viewPassword(event)"></span>
+    </div>
+  </div>
+  <div class="botones">
+    <button id="login" class="btn-material"  onclick="login()">INICIAR SECION</button>
+    <button id="logout" class="btn-material hiden btnGreend"  onclick="outUser()">CERRAR SECION</button>
+  </div>
+  <div class="botones">
+    <button class="btn-material hiden danger" id="pasword" onclick="lnk('cambioPasword')">CAMBIAR CONTRASEÑA</button>
+  </div>
+</div>
+
+<script>
+async function init_m(){ 
+  if(storageBolean('dataUser')){
+    document.getElementById("login").classList.add("hiden")
+    document.getElementById("input").classList.add("hiden")
+    document.getElementById("logout").classList.remove("hiden")
+    document.getElementById("pasword").classList.remove("hiden")
+    document.getElementById("nombre").textContent = storageJson("dataUser").nom
+  }
+}
+
+function loginUser(user,psw){
+  return new Promise(function(resolve,reject){
+    fetch(urlApi+`/login`,{method:'post',headers:{'Accept':'application/json,text/plain','Content-Type':'application/json','x-access-token':psw},
+      body: JSON.stringify({"user":user})
+      }).then(rsp=>{ if(rsp.ok){ rsp.json().then(d=>{ resolve(d) }) } }
+    );
+  })
+}
+function teclaEnter(event) { if(event.keyCode == '13'){ login() } }
+
+/*******login********/
+async function login(){
+  var user = document.getElementById('user').value;
+  var psw = document.getElementById('password').value;
+  loadData()
+  let sig = await loginUser(user, psw)
+  if(sig.msg=="success"){
+    localStorage.setItem("dataUser",JSON.stringify(sig) );
+  }
+  if(sig.msg=="emptyUser"){
+    alert("usuario incorrecto")
+  }
+  if(sig.msg=="errorPsw"){
+    alert("contreseña incorrecta")
+  }
+  successDat("r")
+}
+/*******login********/
+function viewPassword(e){
+  let ps = document.getElementById("password")
+  if(ps.getAttribute('type') === 'password'){
+    ps.setAttribute('type', 'text');
+    e.target.classList.remove('eyesBlack');
+    e.target.classList.add('eyesSlash');
+  }else if(ps.getAttribute('type') === 'text'){
+    ps.setAttribute('type', 'password');
+    e.target.classList.remove('eyesSlash');
+    e.target.classList.add('eyesBlack');
+  }
+}
+/*logout*/
+async function outUser(){
+  loadData()
+  console.log('no existe usuario activo') 
+  localStorage.setItem("dataUser","");
+  document.getElementById("login").classList.remove("hiden")
+  document.getElementById("logout").classList.add("hiden")
+  successDat("r")
+}
+/*logout*/
+</script>  
+</body>
+</html>

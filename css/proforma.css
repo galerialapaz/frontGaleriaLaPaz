@@ -1,0 +1,60 @@
+.itemProf{
+  background-color: rgb(224, 224, 224);
+  width: 400px;
+  border-radius: 5px;
+  margin: auto;
+  margin-bottom: 5px;
+}
+.item{
+  background-color: rgb(224, 224, 224);
+  max-width: 400px;
+  border-radius: 5px;
+  margin: auto;
+  margin-bottom: 10px;
+}
+.fila1{
+  display: flex;
+  justify-content: space-between;
+  padding: 5px;
+}
+.fila1b>span{ margin-left: 10px; }
+.fila1a{
+  display: flex;
+  align-items: center;
+  font-weight: bold;
+}
+.fila1b{
+  display: flex;
+  align-items: center;
+}
+.preUn{
+  width: 150px;
+  justify-content: space-between;
+}
+.fila2{margin-left: 5px;}
+
+.filP2{
+  padding: 5px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.filP2 input{
+  width: 50px;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.fila3{
+  display: flex;
+  justify-content: space-between;
+  padding: 5px;
+}
+.fila3>div{text-align: center;}
+.marcado{ background-color: rgb(162, 255, 149); }
+
+.total{
+  width: 50px;
+  text-align: end;
+}

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ventas</title>
+<link rel="stylesheet" href="../css/head.css">
+<link rel="stylesheet" href="../css/icon.css">
+<link rel="stylesheet" href="../css/menu.css">
+<link rel="stylesheet" href="../css/formulario.css">
+<link rel="stylesheet" href="../css/loadAnimacion.css">
+<link rel="stylesheet" href="../css/botones.css">
+<link rel="stylesheet" href="../css/tabla.css">
+<link rel="stylesheet" href="../cssLib/toastify.css">
+<script src="../js/apiBakend.js"></script>
+<script src="../js/indexedDB.js"></script>
+<script src="../js/fecha.js"></script>
+<script src="../js/formulario.js"></script>
+<script src="../js/localStorage.js"></script>
+<script src="../js/loadAnimacion.js"></script>
+<script src="../js/lnk.js"></script>
+<script src="../js/tabla.js"></script>
+<script src='../jsLib/toastify.js'></script>
+<style>
+.contenTable{
+  width: 98%;
+  height: calc(100vh - 100px);
+  margin: auto;
+  margin-top: 10px;
+  overflow-y: scroll;
+  z-index: 1;
+}
+.total{ display: flex;}
+.total>div{margin: 5px;}
+</style>
+</head>
+<body onload="startDB();">
+<div class="conteMenu">
+  <div class="cajaIzq">
+    <span class="icon back" onclick="window.history.back()"></span>
+    <span id="conection" onclick="sincroBD('movimientos','m')" class="icon cloudDowRed"></span>
+  </div>
+  <div id="fechaVentas_Txt"></div>
+  <div>
+    <span class="icon filter" onclick="lnkRel('filtroSet/filtroVentasAdmin')"></span>
+    <span onclick="listVer()" class="icon menuBurger"></span>  
+  </div>
+</div>  
+
+<div id="contedOcultador" class="contedOcultador"></div>
+
+<div class="buscador">
+  <input type="text" id="buscar" onkeyup="filtroBus()" class="input_ef" placeholder="Buscar Cliente">
+  <div class="total">
+    <div>Total </div><div id="totalTab"></div><div> bs</div>
+  </div>
+</div>
+
+<div class="contenTable">
+  <table onclick="oculVer()">
+    <thead>
+      <tr id="headColm">
+        <th>N°</th>
+        <th>fecha </th>
+        <th>fecha hora</th>
+        <th>vendedor</th>
+        <th>Cliente </th>
+        <th>Total</th>
+        <th>edi</th>
+        <th>ver</th>
+      </tr>
+    </thead>
+    <tbody id="listaDitem"></tbody>
+  </table>
+</div>
+
+<script>
+let du = storageJson("dataUser")
+let fil 
+
+var items = []  
+async function renderTab(){
+  let listVen = await read_DB('movimientos')
+  let rs = await filtroModel2(listVen,fil)
+  //totales tabla
+  let totalTab = 0
+  //totales tabla
+  var outerHTML = '';
+  let n = 1
+  for (let i = 0; i < rs.length; i++) {
+    let el = rs[i];
+    if(el.origen=="deposito_uno"){continue}
+    if(el.origen=="deposito_dos"){continue}
+    if(el.origen=="deposito_general"){continue}
+    outerHTML += 
+    `<tr id="${el.id}">
+      <td>${n}</td>
+      <td>${diaMesCorto(el.fecha)}</td>
+      <td>${fechTxtFull(el.fecha)}</td>
+      <td>${el.dataUser["nom"]}</td>
+      <td>${el.cliente}</td>
+      <td class="bs">${el.total}</td>
+      <td>
+        <span onclick="lnkRelId('${el.id}','venderEditar/proformaVenta')" class="icon pencil">
+      </td>
+      <td>
+        <span onclick="lnkRelId('${el.id}','adminTraslados/ventaInfoAdmin')" class="icon eyes">
+      </td>
+    </tr>`
+    totalTab += el.total
+    n+=1
+    items.push({"id":el.id,"txt":el.cliente}) 
+  }
+  document.querySelector("#listaDitem").innerHTML = outerHTML;
+  document.getElementById("totalTab").textContent = totalTab.toFixed(1)
+  manejoColumnas("tabla")
+}
+
+async function init_m(){ 
+  fil = await storageJsonSetup("filvenadm",{"todo":false,"fecha":fecActInp(),"user":"todos"})
+  document.getElementById("fechaVentas_Txt").textContent = timeToMesDia(fil.fecha) 
+  await renderTab()
+  openSocket("sincVEN");
+}   
+</script>
+</body>
+</html>

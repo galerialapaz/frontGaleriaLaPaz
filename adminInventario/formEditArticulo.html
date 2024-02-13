@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Editar</title>
+<link rel="stylesheet" href="../css/head.css">
+<link rel="stylesheet" href="../css/menu.css">
+<link rel="stylesheet" href="../css/formulario.css">
+<link rel="stylesheet" href="../css/loadAnimacion.css">
+<script src="../js/indexedDB.js"></script>
+<script src="../js/fecha.js"></script>
+<script src="../js/formulario.js"></script>
+<script src="../js/loadAnimacion.js"></script>
+<script src="../js/localStorage.js"></script>
+<script src="../js/apiBakend.js"></script>
+<script src="../js/lnk.js"></script>
+<style>
+.info{width: 100px;}
+.textInput>input{width: 60px;}
+</style>
+</head>
+<body onload="startDB();">
+<div class="conteMenu">
+  <span class="icon back" onclick="window.history.back()"></span>
+  <div class="titMenu">EDITAR ARTICULO</div>
+  <span></span>  
+</div>   
+<br>
+<div class="formularioV1">
+  <div class="contInput">
+    <input data-itemN id="producto" class="input_ef" type="text" placeholder=" " />
+    <label class="label_ef">Producto</label>
+  </div>
+  <div class="contInput">
+    <input data-itemN id="marca" class="input_ef" type="text" placeholder=" " />
+    <label class="label_ef">Marca</label>
+  </div>
+  <div class="contInput">
+    <input data-itemN id="modelo" class="input_ef" type="text" placeholder=" " />
+    <label class="label_ef">Modelo</label>
+  </div>
+  <div class="textInput">
+    <div>Precio Unidad</div>
+    <input data-itemN id="punMx" class="input_ef" type="number" placeholder="max"/>
+    <input data-itemN id="punMn" class="input_ef" type="number" placeholder="min"/>
+    <span id="txtMoneda">Bs.</span>
+  </div>
+  <div class="textInput">
+    <div>Precio Docena</div>
+    <input data-itemN id="pdoMx" class="input_ef" type="number" placeholder="max"/>
+    <input data-itemN id="pdoMn" class="input_ef" type="number" placeholder="min"/>
+    <span id="txtMoneda">Bs.</span>
+  </div>
+  <div class="textInput">
+    <div>Precio Treinte</div>
+    <input data-itemN id="ptrMx" class="input_ef" type="number" placeholder="max"/>
+    <input data-itemN id="ptrMn" class="input_ef" type="number" placeholder="min"/>
+    <span id="txtMoneda">Bs.</span>
+  </div>
+  <div class="textInput">
+    <div>Precio Cincuenta</div>
+    <input data-itemN id="pciMx" class="input_ef" type="number" placeholder="max"/>
+    <input data-itemN id="pciMn" class="input_ef" type="number" placeholder="min"/>
+    <span id="txtMoneda">Bs.</span>
+  </div>
+  <div class="textInput">
+    <div>Precio Centena</div>
+    <input data-itemN id="pceMx" class="input_ef" type="number" placeholder="max"/>
+    <input data-itemN id="pceMn" class="input_ef" type="number" placeholder="min"/>
+    <span id="txtMoneda">Bs.</span>
+  </div>
+  <div class="textInput">
+    <div>Precio Caja</div>
+    <input data-itemN id="pcjMx" class="input_ef" type="number" placeholder="max"/>
+    <input data-itemN id="pcjMn" class="input_ef" type="number" placeholder="min"/>
+    <span id="txtMoneda">Bs.</span>
+  </div>
+  <hr>
+  <div class="textInput">
+    <div>Deposito Uno</div>
+    <input data-itemN id="deposito_uno" class="input_ef" type="number" placeholder="0"/>
+    <span id="txtMoneda">Unidades</span>
+  </div>
+  <div class="textInput">
+    <div>Deposito Dos</div>
+    <input data-itemN id="deposito_dos" class="input_ef" type="number" placeholder="0"/>
+    <span id="txtMoneda">Unidades</span>
+  </div>
+  <div class="textInput">
+    <div>Puesto Uno</div>
+    <input data-itemN id="puesto_uno" class="input_ef" type="number" placeholder="0"/>
+    <span id="txtMoneda">Unidades</span>
+  </div>
+  <div class="textInput">
+    <div>Puesto Dos</div>
+    <input data-itemN id="puesto_dos" class="input_ef" type="number" placeholder="0"/>
+    <span id="txtMoneda">Unidades</span>
+  </div>
+  <hr>
+  <div class="botones">
+    <div id="btnAction" onclick="editarDatos()" class="btn-material info">EDITAR</div> 
+  </div>
+  <br>
+  <div class="botones">
+    <div id="btnAction" onclick="eliminar()" class="btn-material danger">ELIMINAR</div> 
+  </div>
+</div>
+<script>
+var id = storage('id')
+
+async function editarDatos(){
+  var f = await form_to_json("itemN",id) 
+  let r = confirm("EDITAR....?")
+  if(r){
+    loadData()
+    let rs = await apiPostJsonCrud("update",f,"articulos")
+    if(rs.msg=="success"){
+      await update_DB(id,f,'articulos')
+      successDat(); 
+    }else{ alert("error");  successDat(); }
+  }
+}
+
+async function eliminar(){
+  let r = prompt("esta seguro de eliminar ..?")
+  if(r=="si"){
+    loadData()
+    apiPostJsonCrud("delet",{"id":id},"articulos").then((d)=>{
+      if(d.msg=="success"){ 
+        del_DB(id,'articulos').then(()=>{ successDat("b") })
+      }
+    })
+  }
+}
+
+async function init_m(){ 
+  let dat = await read_ID_DB(id,"articulos")
+  await json_to_from("itemN",dat)
+}   
+</script> 
+</body>
+</html>

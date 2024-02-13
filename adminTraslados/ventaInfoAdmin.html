@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Informacion</title>
+<link rel="stylesheet" href="../css/head.css">
+<link rel="stylesheet" href="../css/icon.css">
+<link rel="stylesheet" href="../css/menu.css">
+<link rel="stylesheet" href="../css/formulario.css">
+<link rel="stylesheet" href="../css/loadAnimacion.css">
+<link rel="stylesheet" href="../css/botones.css">
+<link rel="stylesheet" href="../css/tabla.css">
+<link rel="stylesheet" href="../css/proforma.css">
+<link rel="stylesheet" href="../cssLib/toastify.css">
+<script src="../js/apiBakend.js"></script>
+<script src="../js/indexedDB.js"></script>
+<script src="../js/fecha.js"></script>
+<script src="../js/formulario.js"></script>
+<script src="../js/localStorage.js"></script>
+<script src="../js/loadAnimacion.js"></script>
+<script src="../js/lnk.js"></script>
+<script src="../js/tabla.js"></script>
+<script src='../jsLib/toastify.js'></script>
+<style>
+.formularioV1{ margin-top: 0px; max-width: 90%;}
+#productosList{
+  overflow-y: scroll;
+  height: calc(100vh - 130px);
+}
+</style>
+</head>
+<body onload="startDB();">
+<div class="conteMenu">
+  <span class="icon back" onclick="window.history.back()"></span>
+  <div class="titMenu">INFORMACION</div>
+  <span onclick="eliminar()" class="icon borrarWite"></span>
+</div> 
+
+<div class="formularioV1">
+  <div class="textDataInf">
+    <div>Vendedor :</div>
+    <div id="vendedor" ></div>
+  </div>
+  <div class="textDataInf">
+    <div>Puesto :</div>
+    <div id="origen" ></div>
+  </div>
+  <div class="textDataInf">
+    <div>Cliente :</div>
+    <div data-cli id="cliente" ></div>
+  </div>
+  <div class="textDataInf">
+    <div>Total: Bs.</div>
+    <div data-cli id="total"></div>
+  </div>
+</div>
+<br>
+<div id="productosList" class="contenItems"></div>
+
+<script>
+var id = storage('id')
+
+var carrito
+function rederVenta(){
+  var outerHTML = '';
+  for (const key in carrito) {
+    const el = carrito[key];
+    outerHTML +=     
+    `<div class="itemProf">
+      <div class="fila1">
+        <div class="fila1a">${el.marca}</div>
+        <div class="fila1b">
+          <span>${el.modelo}</span>  
+        </div>
+      </div>
+      <div class="filP2">
+        <div class="fila1b">
+          <div>Cantidad</div>
+          <span>${el.cant}</span>  
+        </div>
+        <div class="fila1b">
+          <div>Bs.</div>
+          <span>${el.tot}</span> 
+        </div>
+      </div>
+    </div>`
+  }
+  document.querySelector("#productosList").innerHTML = outerHTML;
+}
+
+async function eliminar(){
+  let r = prompt("esta seguro de eliminar ..?")
+  if(r=="si"){
+    loadData()
+    apiPostJsonRut("deleteMovimiento",{"id":id}).then((d)=>{
+      if(d.msg=="success"){ 
+        del_DB(id,'movimientos').then(()=>{ 
+          console.log(d)
+          //successDat("b") 
+        })
+      }
+    })
+  }
+}
+
+async function init_m(){ 
+  let dat = await read_ID_DB(id,"movimientos")
+  document.getElementById("vendedor").textContent = dat.dataUser["nom"]
+  document.getElementById("origen").textContent = dat.origen.split("_")[0].toUpperCase()+" "+dat.origen.split("_")[1].toUpperCase()
+  await json_to_from("cli",dat)
+  carrito = dat["proforma"]
+  rederVenta()
+}
+</script>   
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="../css/head.css">
+<link rel="stylesheet" href="../css/menu.css">
+<link rel="stylesheet" href="../css/formulario.css">
+<link rel="stylesheet" href="../css/loadAnimacion.css">
+<link rel="stylesheet" href="../css/botones.css">
+<link rel="stylesheet" href="../css/icon.css">
+<link rel="stylesheet" href="../css/tabla.css">
+<script src="../js/apiBakend.js"></script>
+<script src="../js/indexedDB.js"></script>
+<script src="../js/fecha.js"></script>
+<script src="../js/formulario.js"></script>
+<script src="../js/localStorage.js"></script>
+<script src="../js/loadAnimacion.js"></script>
+<script src="../js/lnk.js"></script>
+<script src="../js/tabla.js"></script>
+<script src="../js/utilidades.js"></script>
+<title>Registro Inventario Excel</title>
+<style type="text/css">
+.inportExport{
+	display: flex;
+	justify-content: space-evenly;
+	margin: 10px;
+}
+.contendTable{
+	width: 100%;
+	overflow-x: scroll;
+	height: calc(100vh - 120px);
+}
+.nota{
+	text-align: center;
+	padding: 10px;
+}
+</style>
+</head>
+<body onload="startDB();">
+<div class="conteMenu">
+	<span class="icon back" onclick="window.history.back()"></span>
+	<div class="titMenu">CARGAR INVENTARIO DESDE EXEL</div>
+	<span></span>
+</div>
+
+<div class="inportExport">
+	<div>
+	  <label for="archivoexcel" class="btn-material">SELECIONE ARCHIVO</label>
+	  <input type="file" onchange="verArc(event)" name="archivoexcel" id="archivoexcel" style="display: none;">
+	</div>
+	<div>
+		<span onclick="guardarInv()" class="btn-material">REGISTRAR ARCHIVO</span>
+	</div>
+</div>
+<br>	
+<div class="contendTable">    
+	<table class="tablaVenta">
+		<thead>
+		  <tr>
+        <th>N°</th>
+        <th>Nombre</th>
+        <th>Rol</th>
+      </tr>
+		</thead>
+		<tbody id="itemCompra"></tbody>
+	</table>
+</div> 
+
+
+<script>
+let dataTx
+function verArc(e){
+  var archivo = e.target.files[0];
+  if (!archivo) { return; }
+  var lector = new FileReader();
+  lector.onload = function(e) {
+    var contenido = e.target.result;
+    dataTx = JSON.parse(contenido)
+    rederItem()
+  };
+  lector.readAsText(archivo)
+}
+function rederItem(){
+  var outerHTML = '';
+	for (let i = 0; i < dataTx.length; i++) {
+		const el = dataTx[i];
+		outerHTML += 
+    `<tr>
+      <td>${i+1}</td>
+      <td>${el.nom}</td>
+      <td>${el.rol}</td>
+    </tr>	`  
+	}
+  document.querySelector("#itemCompra").innerHTML = outerHTML;
+}
+
+async function guardarInv(){
+  loadData()
+	for (let i = 0; i < dataTx.length; i++) {
+		var item = dataTx[i];
+    let reg = await apiPostJsonRut("createdUse",item)
+    if(reg.msg=="success"){
+			await write_DB(item,'usuarios')
+    	console.log("guardando......")
+    }
+		document.getElementById("conter").textContent = i+1
+	}
+	console.log("subido....")
+  successDat()
+}
+
+function init_m(){ }
+</script>
+</body>
+</html>

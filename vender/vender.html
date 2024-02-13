@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>VENDER</title>
+<link rel="stylesheet" href="../css/head.css">
+<link rel="stylesheet" href="../css/icon.css">
+<link rel="stylesheet" href="../css/menu.css">
+<link rel="stylesheet" href="../css/formulario.css">
+<link rel="stylesheet" href="../css/loadAnimacion.css">
+<link rel="stylesheet" href="../css/botones.css">
+<link rel="stylesheet" href="../css/tabla.css">
+<link rel="stylesheet" href="../css/proforma.css">
+<link rel="stylesheet" href="../cssLib/toastify.css">
+<script src="../js/apiBakend.js"></script>
+<script src="../js/indexedDB.js"></script>
+<script src="../js/fecha.js"></script>
+<script src="../js/formulario.js"></script>
+<script src="../js/localStorage.js"></script>
+<script src="../js/loadAnimacion.js"></script>
+<script src="../js/lnk.js"></script>
+<script src="../js/tabla.js"></script>
+<script src='../jsLib/toastify.js'></script>
+<style>
+#productosList{
+  overflow-y: scroll;
+  height: calc(100vh - 110px);
+  margin-top: 5px;
+}
+#fecha{color: white;font-weight: bold;}
+.hiden{ display: none;}
+.datosFinal{
+  display: flex;
+  justify-content: space-between;
+  margin: 10px;
+}
+#cliente{
+  width: 60%;
+  margin-top: 15px;
+}
+#celular{
+  width: 25%;
+  margin-top: 15px;
+}
+</style>
+</head>
+<body onload="startDB();">
+<div class="conteMenu">
+  <span class="icon back" onclick="window.history.back()"></span>
+  <span onclick="regVenta()" id="bntVender" class="btn-material">vender</span> 
+  <span id="fecha" class="fechaMenu"></span>
+</div>  
+
+<div id="productosList"></div>
+
+<div class="datosFinal">
+  <input data-item id="cliente" class="input_ef" type="text" placeholder="Cliente"/>
+  <input data-item id="celular" class="input_ef" type="number" placeholder="Celular"/>
+  <div class="textDataInf">
+    <div>Total</div>
+    <div id="sumaTotal"></div>
+  </div>
+</div>
+
+<script>
+var car = storageJson("proforma")
+
+async function rederVenta(){
+  let arr = Object.values(car).sort((x, y) => x.marca.localeCompare(y.marca));
+  var outerHTML = '';
+  for (let i = 0; i < arr.length; i++) {
+    const el = arr[i];
+    let art = await read_ID_DB(el.id,"articulos")
+    let pr = "0 - 0"
+    if(el.cant<3){ pr = art.punMn +" - "+ art.punMx }
+    if(el.cant>=3){ pr = art.pdoMn +" - "+ art.pdoMx }
+    if(el.cant>=30){ pr = art.ptrMn +" - "+ art.ptrMx }
+    if(el.cant>=50){ pr = art.pciMn +" - "+ art.pciMx }
+    if(el.cant>=100){ pr = art.pceMn +" - "+ art.pceMx }
+    outerHTML += 
+    `<div class="itemProf">
+      <div class="fila1">
+        <div class="fila1a">${el.marca}</div>
+        <div class="fila1b">
+          <span>${el.modelo}</span>  
+          <span onclick="quitarCarro('${el.id}')" class="icon borrar"></span> 
+        </div>
+      </div>
+      <div class="filP2">
+        <div class="fila1b">
+          <div>Cant.</div>
+          <input onkeyup="cantidad('${el.id}')" type="number" value="${el.cant}" id="${el.id}_cant"/> 
+        </div>
+        <div class="fila1b preUn">
+          <div id="${el.id}_bs">${pr}</div> 
+          <input onkeyup="pu('${el.id}')" type="number" value="${el.pu}" id="${el.id}_pu"/> 
+        </div>
+        <div class="fila1b">
+          <div class="total" id="${el.id}_tot">${el.tot}</div>
+          <div>&nbsp;Bs</div>
+        </div>
+      </div>
+    </div>`
+  }
+  document.querySelector("#productosList").innerHTML = outerHTML;
+  sumaItems()
+}
+
+///////////////////////////SECCION DE CALCULOS////////////////////
+let total
+function sumaItems(){
+  total = 0
+  for (const key in car){ total +=  dcm(car[key]["tot"]) }
+  document.getElementById("sumaTotal").textContent = dcm(total) 
+}
+async function cantidad(id){
+  let cant = ValNum(id+"_cant")
+  car[id]["cant"] = cant
+  let art = await read_ID_DB(id,"articulos")
+  let pr 
+  if(cant<3){ pr = art.punMn +" - "+ art.punMx }
+  if(cant>=3){ pr = art.pdoMn +" - "+ art.pdoMx }
+  if(cant>=30){ pr = art.ptrMn +" - "+ art.ptrMx }
+  if(cant>=50){ pr = art.pciMn +" - "+ art.pciMx }
+  if(cant>=100){ pr = art.pceMn +" - "+ art.pceMx }
+  document.getElementById(id+"_bs").textContent = pr
+  document.getElementById(id+"_cant").style.backgroundColor = "rgb(250,250,250)"
+  await setcar(car)
+}
+async function pu(id){
+  let pu = ValNum(id+"_pu")
+  let cant = ValNum(id+"_cant")
+  car[id]["pu"] = pu
+  car[id]["tot"] = dcm(pu*cant)
+  sumaItems()
+  await setcar(car)
+  document.getElementById(id+"_pu").style.backgroundColor = "rgb(250,250,250)"
+  document.getElementById(id+"_tot").textContent = dcm(car[id]["tot"]) 
+}
+async function quitarCarro(id){ 
+  delete car[id]; 
+  await setcar(car)
+  window.location.reload()
+}
+///////////////////////////SECCION DE CALCULOS////////////////////
+
+let du = storageJson("dataUser")
+async function regVenta(){
+  let d = await form_to_json("item")
+
+  for (const key in car){ 
+    let itm =  car[key]
+    let art = await read_ID_DB(itm.id,"articulos")
+    if(itm.cant>art[du.rol]){
+      alert("exite un cantidad incorecto")
+      document.getElementById(itm.id+"_cant").style.backgroundColor = "rgb(250,200,200)"
+      return
+    }
+    let mn 
+    if(itm.cant<3){ mn = art.punMn }
+    if(itm.cant>=3){ mn = art.pdoMn }
+    if(itm.cant>=30){ mn = art.ptrMn }
+    if(itm.cant>=50){ mn = art.pciMn }
+    if(itm.cant>=100){ mn = art.pceMn }
+    if(itm.pu<mn){
+      alert("exite un monto incorecto")
+      document.getElementById(itm.id+"_pu").style.backgroundColor = "rgb(250,200,200)"
+      return
+    }
+  }
+
+  if(d.cliente==""){alert("Se requiere Nombre Cliente");return;}
+  let r = confirm("Vender ...?")
+  if(r){
+    loadData()
+    d["origen"] = du.rol
+    d["destino"] = document.getElementById("cliente").value
+    d["proforma"] = car
+    d["total"] = total
+    let c = await apiPostJsonRut("createdMovimiento",d) 
+    if(c.msg=="success"){
+      console.log(c)
+      localStorage.setItem("proforma","")
+      document.getElementById("bntVender").style.display = "none"
+      await write_DB(d,'movimientos')
+      successDat()
+      sendMessage()
+    }else{ alert("error") }
+  }
+}
+
+function setcar(car){
+  return new Promise(function(resolve,reject){ 
+    localStorage.setItem("proforma",JSON.stringify(car))
+    resolve()
+  })
+}
+function init_m(){ 
+  rederVenta()
+  openSocket(); 
+}
+</script>
+</body>
+</html>

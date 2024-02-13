@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>VENDER</title>
+<link rel="stylesheet" href="../css/head.css">
+<link rel="stylesheet" href="../css/icon.css">
+<link rel="stylesheet" href="../css/menu.css">
+<link rel="stylesheet" href="../css/formulario.css">
+<link rel="stylesheet" href="../css/loadAnimacion.css">
+<link rel="stylesheet" href="../css/botones.css">
+<link rel="stylesheet" href="../css/tabla.css">
+<link rel="stylesheet" href="../css/proforma.css">
+<link rel="stylesheet" href="../cssLib/toastify.css">
+<script src="../js/apiBakend.js"></script>
+<script src="../js/indexedDB.js"></script>
+<script src="../js/fecha.js"></script>
+<script src="../js/formulario.js"></script>
+<script src="../js/localStorage.js"></script>
+<script src="../js/loadAnimacion.js"></script>
+<script src="../js/lnk.js"></script>
+<script src="../js/tabla.js"></script>
+<script src='../jsLib/toastify.js'></script>
+<style>
+#productosList{
+  overflow-y: scroll;
+  height: calc(100vh - 100px);
+}
+#fecha{color: white;font-weight: bold;}
+.hiden{ display: none;}
+</style>
+</head>
+<body onload="startDB();">
+<div class="conteMenu">
+  <span class="icon back" onclick="window.history.back()"></span>
+  <span onclick="regVenta()" id="bntVender" class="btn-material">TRASLADAR</span> 
+  <span id="fecha" class="fechaMenu"></span>
+</div>  
+<br>
+<div class="formularioV1">
+  <div class="txtAndSelector">
+    <div class="textSelec">Destino :</div> 
+    <div class="selectTip1">
+      <select data-item class="selector" id="destino">
+        <option value="" selected>Ninguno</option>
+        <option value="puesto_uno">Puesto Uno</option>
+        <option value="puesto_dos">Puesto Dos</option>
+      </select>
+      <div class="select-icon">
+        <svg focusable="false" viewBox="0 0 104 128" width="25" height="35">
+          <path d="m2e1 95a9 9 0 0 1 -9 9 9 9 0 0 1 -9 -9 9 9 0 0 1 9 -9 9 9 0 0 1 9 9zm0-3e1a9 9 0 0 1 -9 9 9 9 0 0 1 -9 -9 9 9 0 0 1 9 -9 9 9 0 0 1 9 9zm0-3e1a9 9 0 0 1 -9 9 9 9 0 0 1 -9 -9 9 9 0 0 1 9 -9 9 9 0 0 1 9 9zm14 55h68v1e1h-68zm0-3e1h68v1e1h-68zm0-3e1h68v1e1h-68z"></path>
+        </svg>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="productosList"></div>
+
+<script>
+var car = storageJson("proforma")
+
+async function rederVenta(){
+  let arr = Object.values(car).sort((x, y) => x.marca.localeCompare(y.marca));
+  var outerHTML = '';
+  for (let i = 0; i < arr.length; i++) {
+    const el = arr[i];
+    outerHTML += 
+    `<div class="itemProf">
+      <div class="fila1">
+        <div class="fila1a">${el.marca}</div>
+        <div class="fila1b">
+          <span>${el.modelo}</span>  
+          <span onclick="quitarCarro('${el.id}')" class="icon borrar"></span> 
+        </div>
+      </div>
+      <div class="filP2">
+        <div class="fila1b">
+          <div>Cantidad</div>
+          <input type="number" onkeyup="imprItem('${el.id}')" id="${el.id}_cant" value="${el.cant}" /> 
+        </div>
+      </div>
+    </div>`
+  }
+  document.querySelector("#productosList").innerHTML = outerHTML;
+}
+async function imprItem(id){
+  let cant = ValNum(id+"_cant")
+  car[id]["cant"] = cant
+  await setcar(car)
+}
+async function quitarCarro(id){ 
+  delete car[id]; 
+  await setcar(car)
+  window.location.reload()
+}
+
+let du = storageJson("dataUser")
+async function regVenta(){
+  let d = await form_to_json("item")
+  if(d.destino==""){alert("Se requiere Destino");return;}
+  let r = confirm("Trasladar ...?")
+  if(r){
+    loadData()
+    d["origen"] = du.rol
+    d["proforma"] = car
+    let c = await apiPostJsonRut("createdMovimiento",d) 
+    if(c.msg=="success"){
+      localStorage.setItem("proforma","")
+      document.getElementById("bntVender").style.display = "none"
+      await write_DB(d,'movimientos')
+      successDat()
+      sendMessage()
+    }else{ alert("error") }
+
+  }
+}
+
+function setcar(car){
+  return new Promise(function(resolve,reject){ 
+    localStorage.setItem("proforma",JSON.stringify(car))
+    resolve()
+  })
+}
+function init_m(){ 
+  rederVenta() 
+  openSocket(); 
+}
+</script>
+</body>
+</html>

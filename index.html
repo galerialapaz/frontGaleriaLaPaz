@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="es" >
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<link rel="stylesheet" href="css/head.css">
+<link rel="stylesheet" href="css/index.css">
+<link rel="stylesheet" href="css/menu.css">
+<link rel="stylesheet" href="css/formulario.css">
+<link rel="stylesheet" href="css/loadAnimacion.css">
+<link rel="stylesheet" href="css/icon.css">
+<script src="../js/indexedDB.js"></script>
+<script src="../js/formulario.js"></script>
+<script src="../js/loadAnimacion.js"></script>
+<script src="../js/localStorage.js"></script>
+<script src="../js/apiBakend.js"></script>
+<script src="../js/lnk.js"></script>
+<title>Sistema</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Sistema">
+<link rel="apple-touch-icon" href="/images/icons/icon-152x152.png">
+<meta name="description" content="Sistema">
+<meta name="theme-color" content="#c9c9c9" />
+<style>
+.tituloIndex{
+  text-align: center;
+  padding: 5px;
+  font-size: 1.5em;
+}
+#nombre{
+  text-align: center;
+  padding: 5px;
+  font-weight: bold;
+  margin-top: 15px;
+}
+.oferta{
+  margin-top: 10px;
+  text-align: center;
+  padding: 5px;
+  font-weight: bold;
+  color: red;
+}
+/********* enlaces **********/
+.contenGral{
+  height: calc(100vh - 100px);
+  overflow-y: scroll;
+}
+.menu{
+  text-align: center;
+  padding: 5px;
+}
+.enlace{
+  display: block;
+  background-color: rgb(221, 221, 221);
+  text-align: center;
+  font-size: 1em;
+  font-weight: bolder;
+  margin-left: 50%;
+  transform: translateX(-50%);
+  width: 75%;
+  margin-top: 10px;
+  border-radius: 15px;
+  color: rgb(0, 0, 0);
+  padding: 10px;
+  text-decoration: none;
+}
+/********** enlaces ********/
+.btn-material{ width: 250px; }
+input{text-align: center;}
+.vercion{position:fixed;right: 0;bottom: 0px;padding: 5px;}
+</style>  
+</head>
+<body onload="startDB()">
+<span id="butInstall" class="pulse"><span>Instalar</span></span>
+<h1 class="tituloIndex">Sistema</h1>
+
+<div id="nombre"></div>
+   
+<div class="formularioV1" id="login">
+  <br><br>
+  <div id="input">
+    <div class="contInput">
+      <input  id="user" onkeyup="teclaEnter(event)" class="input_ef" type="text" placeholder=""/>
+      <label class="label_ef">Usuario</label>
+    </div>
+    <div class="contInput">
+      <input id="password" onkeyup="teclaEnter(event)" class="input_ef" type="password" placeholder=""/>
+      <label class="label_ef">Contraseña</label>
+      <span class="btnEyePass icon eyesBlack" onclick="viewPassword(event)"></span>
+    </div>
+  </div>
+  <div class="botones">
+    <button id="login" class="btn-material verde"  onclick="login()">INICIAR SECION</button>
+  </div>
+</div>
+
+<div id="vender" class="contenGral hiden">
+  <div class="menu">
+    <a class="enlace" href="vender/proformaVenta.html">VENDER</a>
+  </div>
+  <div class="menu">
+    <a class="enlace" href="vender/listaVentasVendedor.html">LISTA DE VENTAS</a>
+  </div>
+  <div class="menu">
+    <a class="enlace" onclick="descargaDatos('')">DESCARGA DATOS</a>
+  </div>
+</div>
+
+<div id="deposito" class="contenGral hiden">
+  <div class="menu">
+    <a class="enlace" href="mover/proformaMovimiento.html">TRASLADOS ARTICULOS</a>
+  </div>
+  <div class="menu">
+    <a class="enlace" href="mover/listaTraslados.html">LISTA DE TRASLADOS</a>
+  </div>
+  <div class="menu">
+    <a class="enlace" onclick="descargaDatos('')">DESCARGA DATOS</a>
+  </div>
+</div>
+
+<div id="deposito_general" class="contenGral hiden">
+  <div class="menu">
+    <a class="enlace" onclick="moveGral('deposito_uno')">DEPOSITO UNO</a>
+    <a class="enlace" onclick="listaGral('deposito_uno')">TRASLADOS DEPOSITO UNO</a>
+  </div>
+  <div class="menu">
+    <a class="enlace" onclick="moveGral('deposito_dos')">DEPOSITO DOS</a>
+    <a class="enlace" onclick="listaGral('deposito_dos')">TRASLADOS DEPOSITO DOS</a>
+  </div>
+  <div class="menu">
+    <a class="enlace" href="moverGral/inventarioGral.html">INVENTARIO</a>
+  </div>
+  <div class="menu">
+    <a class="enlace" onclick="descargaDatos('')">DESCARGA DATOS</a>
+  </div>
+</div>
+
+<div id="Administrador" class="contenGral hiden">
+  <div class="menu">
+    <a class="enlace" href="adminInventario/formRegArticulo.html">REGISTRAR ARTICULO</a>
+    <a class="enlace" href="adminInventario/inventario.html">LISTA ARTICULOS</a>
+  </div>
+  <div class="menu">
+    <a class="enlace" href="adminTraslados/listaVentasAdmin.html">VENTAS</a>
+    <a class="enlace" href="adminTraslados/listaTrasladosAdmin.html">TRASLADOS</a>
+  </div>
+  <div class="menu">
+    <a class="enlace" onclick="descargaDatos('admin')">DESCARGA DATOS</a>
+  </div>
+  <div class="menu">
+    <a class="enlace" href="usuarios/formReg.html">REGISTRAR USUARIO</a>
+    <a class="enlace" href="usuarios/tablaUsuarios.html">USUARIOS</a>
+  </div>
+</div>
+
+<div id="Sistema" class="contenGral hiden">
+  <div class="menu">
+    <a class="enlace" href="adminInventario/formRegArticulo.html">REGISTRAR ARTICULO</a>
+    <a class="enlace" href="adminInventario/inventario.html">ARTICULOS</a>
+  </div>
+  <div class="menu">
+    <a class="enlace" href="administrarUsuarios/formReg.html">REGISTRAR USUARIO</a>
+    <a class="enlace" href="administrarUsuarios/tabla.html">USUARIOS</a>
+  </div>
+  <div class="menu">
+    <a class="enlace" href="vender/proformaVenta.html">VENDER</a>
+    <a class="enlace" href="adminArticulo/formEditPrecio.html">MOVIMENTOS DEPOSITO UNO</a>
+  </div>
+
+  <div class="menu">
+    <a class="enlace" href="tablasData/descargaDataBaseNichos.html">Descargar Base Datos Nicho</a>
+  </div>
+  <div class="menu">
+    <a class="enlace" href="utilidades/sizeDB.html">Tamaño de Base de Datos</a>
+  </div>
+</div>
+
+<div class="vercion">V1</div>
+<div class="conf">
+  <a class="btnConfg" href="login/login.html"><span class="iconUseConf"></span></a>
+</div>
+<script>
+function descargaDatos(tp){
+  localStorage.setItem("tipoDescarga",tp)
+  lnkRel("utilidades/descargaMovimientos")
+}
+function moveGral(tp){
+  localStorage.setItem("deposito",tp)
+  lnkRel("moverGral/proformaMovimientoGral")
+}
+function listaGral(tp){
+  localStorage.setItem("deposito",tp)
+  lnkRel("moverGral/listaTrasladosGral")
+}
+async function init_m(){
+  if(storageBolean("dataUser")){
+    let dt = storageJson("dataUser")
+    document.getElementById("nombre").textContent = dt.nom
+
+    if(dt.rol=="Sistema"){ document.getElementById("Sistema").classList.remove("hiden") }
+    if(dt.rol=="Administrador"){ document.getElementById("Administrador").classList.remove("hiden") }
+    if(dt.rol=="deposito_general"){ document.getElementById("deposito_general").classList.remove("hiden") }
+    if(dt.rol=="puesto_uno"||dt.rol=="puesto_dos"){ document.getElementById("vender").classList.remove("hiden") }
+    if(dt.rol=="deposito_uno"||dt.rol=="deposito_dos"){ document.getElementById("deposito").classList.remove("hiden") }
+
+    document.getElementById("login").classList.add("hiden")
+  }
+}
+
+/*******login********/
+function loginUser(user,psw){
+  return new Promise(function(resolve,reject){
+    fetch(urlApi+`/login`,{method:'post',headers:{'Accept':'application/json,text/plain','Content-Type':'application/json','x-access-token':psw},
+      body: JSON.stringify({"user":user})
+      }).then(rsp=>{ if(rsp.ok){ rsp.json().then(d=>{ resolve(d) }) } }
+    );
+  })
+}
+function teclaEnter(event) { if(event.keyCode == '13'){ login() } }
+async function login(){
+  loadData()
+  let sig = await loginUser(document.getElementById('user').value, document.getElementById('password').value)
+  if(sig.msg=="success"){ localStorage.setItem("dataUser",JSON.stringify(sig) ); }
+  if(sig.msg=="emptyUser"){ alert("usuario incorrecto") }
+  if(sig.msg=="errorPsw"){ alert("contreseña incorrecta") }
+  successDat("r")
+}
+function viewPassword(e){
+  let ps = document.getElementById("password")
+  if(ps.getAttribute('type') === 'password'){
+    ps.setAttribute('type', 'text');
+    e.target.classList.remove('eyesBlack');
+    e.target.classList.add('eyesSlash');
+  }else if(ps.getAttribute('type') === 'text'){
+    ps.setAttribute('type', 'password');
+    e.target.classList.remove('eyesSlash');
+    e.target.classList.add('eyesBlack');
+  }
+}
+/*******login********/
+/*boton instalacion pwa
+let deferredInstallPrompt = null;
+const installButton = document.getElementById('butInstall');
+installButton.addEventListener('click', installPWA);
+window.addEventListener('beforeinstallprompt', saveBeforeInstallPromptEvent);
+function saveBeforeInstallPromptEvent(evt) {
+  deferredInstallPrompt = evt;
+  installButton.style.display = "inline"
+}
+function installPWA(){
+  deferredInstallPrompt.prompt();
+  installButton.style.display = "none"
+  deferredInstallPrompt.userChoice
+  .then((choice) => {
+    if (choice.outcome === 'accepted'){ console.log('User accepted the A2HS prompt', choice);
+    }else{ console.log('User dismissed the A2HS prompt', choice); }
+    deferredInstallPrompt = null;
+  });
+}
+window.addEventListener('appinstalled', logAppInstalled);
+function logAppInstalled(evt) { console.log('installed.', evt);} */
+/*boton instalacion pwa*/ 
+/*serviceWorker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw-admin.js')
+    .then((reg) => { console.log('Service worker registered.'); });
+  });
+}*/
+/*serviceWorker*/
+</script>
+</body>
+</html>
